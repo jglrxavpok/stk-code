@@ -332,6 +332,24 @@ void CameraNormal::update(float dt)
         getCameraSettings(&above_kart, &cam_angle, &side_way, &distance, &smoothing, &cam_roll_angle);
         positionCamera(dt, above_kart, cam_angle, side_way, distance, smoothing, cam_roll_angle);
     }
+
+    if (RaceManager::get()->isSoccerMode())
+    {
+        SoccerWorld* soccer_world = dynamic_cast<SoccerWorld*> (World::getWorld());
+        if (soccer_world)
+        {
+            const float distanceBehindKart = 2.0f;
+            const float distanceAboveKart = 1.0f;
+            const Vec3 kartPosition = m_kart->getSmoothedTrans()(Vec3(0, distanceAboveKart, 0));
+            const Vec3 ballPos = soccer_world->getBallPosition();
+            Vec3 directionXZ = ballPos - kartPosition;
+            directionXZ.setY(0.0f);
+            directionXZ.normalize();
+            m_camera->setPosition((kartPosition - directionXZ * distanceBehindKart).toIrrVector());
+            m_camera->setTarget(ballPos.toIrrVector());
+        }
+    }
+
 }   // update
 
 
